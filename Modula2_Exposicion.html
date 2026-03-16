@@ -1,0 +1,2117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modula-2: El Arquitecto de la Programación Modular</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { corePlugins: { preflight: true } }</script>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/delphi.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-pink: #ff00ff;
+            --neon-yellow: #ffff00;
+            --dark-bg: #0a0a0f;
+            --code-bg: #1e1e2e;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-bg);
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+        
+        .font-mono { font-family: 'Fira Code', monospace; }
+        .font-cyber { font-family: 'Orbitron', sans-serif; }
+        
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #1a1a2e; }
+        ::-webkit-scrollbar-thumb { background: var(--neon-cyan); border-radius: 5px; }
+        
+        .neon-text {
+            text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan), 0 0 40px var(--neon-cyan);
+        }
+        
+        .neon-border {
+            box-shadow: 0 0 10px var(--neon-cyan), inset 0 0 10px rgba(0, 243, 255, 0.1);
+            border: 1px solid var(--neon-cyan);
+        }
+        
+        .neon-pink-text {
+            text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink);
+        }
+        
+        .code-block {
+            background: var(--code-bg);
+            border-radius: 12px;
+            border: 2px solid #333;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .code-block:hover {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .code-header {
+            background: linear-gradient(90deg, #2d2d44, #1e1e2e);
+            padding: 15px 20px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .code-dot { width: 14px; height: 14px; border-radius: 50%; }
+        .dot-red { background: #ff5f56; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green { background: #27c93f; }
+        
+        pre {
+            margin: 0 !important;
+            padding: 30px !important;
+            font-size: 1.1rem !important;
+            line-height: 1.7 !important;
+            overflow-x: auto;
+        }
+        
+        code {
+            font-family: 'Fira Code', monospace !important;
+            font-size: 1.05rem !important;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-left: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 20px;
+            height: 20px;
+            background: var(--neon-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 20px var(--neon-cyan);
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 9px;
+            top: 30px;
+            width: 2px;
+            height: calc(100% + 10px);
+            background: linear-gradient(to bottom, var(--neon-cyan), transparent);
+        }
+        
+        .timeline-item:last-child::after { display: none; }
+        
+        .grid-bg {
+            background-image: 
+                linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        
+        .feature-card {
+            background: rgba(30, 30, 46, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 20px 40px rgba(0, 243, 255, 0.2);
+        }
+        
+        .typewriter {
+            overflow: hidden;
+            border-right: 3px solid var(--neon-cyan);
+            white-space: nowrap;
+            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+        
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--neon-cyan); }
+        }
+        
+        .module-box {
+            background: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%);
+            border: 2px solid var(--neon-cyan);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .module-box::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(45deg, var(--neon-cyan), var(--neon-pink), var(--neon-cyan));
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .module-box:hover::before { opacity: 1; }
+        
+        section {
+            position: relative;
+            min-height: 100vh;
+            padding: 80px 20px;
+        }
+        
+        .compiler-step {
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 16px 20px;
+            border-radius: 12px;
+            border: 1px solid transparent;
+        }
+        
+        .compiler-step:hover {
+            background: rgba(0, 243, 255, 0.1);
+            transform: translateX(10px);
+            border-color: rgba(0, 243, 255, 0.3);
+        }
+        
+        .compiler-step.active {
+            background: rgba(0, 243, 255, 0.2);
+            border-left: 4px solid var(--neon-cyan);
+        }
+        
+        @media (max-width: 768px) {
+            pre { font-size: 0.85rem !important; padding: 15px !important; }
+            .font-cyber { font-size: 2rem !important; }
+            section { padding: 60px 12px; }
+        }
+        
+        .history-card {
+            background: linear-gradient(135deg, rgba(30,30,46,0.8) 0%, rgba(20,20,35,0.9) 100%);
+            border: 1px solid rgba(0,243,255,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .history-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--neon-cyan), var(--neon-pink));
+        }
+
+        /* Terminal animation */
+        .terminal-window {
+            background: #0c0c0c;
+            border-radius: 12px;
+            border: 1px solid #333;
+            overflow: hidden;
+            font-family: 'Fira Code', monospace;
+        }
+        .terminal-header {
+            background: #1a1a2e;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid #333;
+        }
+        .terminal-body {
+            padding: 20px;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: #a0ffa0;
+            min-height: 200px;
+        }
+        .terminal-body .prompt { color: #00f3ff; }
+        .terminal-body .command { color: #ffffff; }
+        .terminal-body .output { color: #a0ffa0; }
+        .terminal-body .error { color: #ff5f56; }
+        .terminal-body .warning { color: #ffbd2e; }
+        .terminal-body .comment { color: #666; }
+
+        /* Floating particles */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--neon-cyan);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float-up 8s infinite ease-in-out;
+        }
+        @keyframes float-up {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+            50% { transform: translateY(-100px) translateX(20px); opacity: 0.7; }
+        }
+
+        /* Compiler pipeline */
+        .pipeline-arrow {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--neon-cyan);
+        }
+        .pipeline-arrow::after {
+            content: '';
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+            animation: pulse-line 2s infinite;
+        }
+        @keyframes pulse-line {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Scroll progress */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
+            z-index: 100;
+            transition: width 0.1s;
+        }
+
+        /* Back to top */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(0, 243, 255, 0.15);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 90;
+            backdrop-filter: blur(10px);
+        }
+        .back-to-top.visible { opacity: 1; }
+        .back-to-top:hover {
+            background: rgba(0, 243, 255, 0.3);
+            transform: translateY(-3px);
+        }
+
+        /* Smooth scroll */
+        html { scroll-behavior: smooth; }
+
+        /* Section fade in */
+        .fade-section {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .fade-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="grid-bg">
+
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- Back to Top -->
+    <button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0})">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+        </svg>
+    </button>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-cyan-500/30">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="font-cyber text-2xl font-bold text-cyan-400 tracking-wider">MODULA-2</div>
+            <div class="hidden md:flex gap-5 text-sm font-mono">
+                <a href="#inicio" class="hover:text-cyan-400 transition-colors">01.INICIO</a>
+                <a href="#historia" class="hover:text-cyan-400 transition-colors">02.HISTORIA</a>
+                <a href="#tipo" class="hover:text-cyan-400 transition-colors">03.TIPO</a>
+                <a href="#sintaxis" class="hover:text-cyan-400 transition-colors">04.SINTAXIS</a>
+                <a href="#modulos" class="hover:text-cyan-400 transition-colors">05.MÓDULOS</a>
+                <a href="#compilador" class="hover:text-cyan-400 transition-colors">06.COMPILADOR</a>
+                <a href="#ejemplo" class="hover:text-cyan-400 transition-colors">07.EJEMPLO</a>
+                <a href="#legado" class="hover:text-cyan-400 transition-colors">08.LEGADO</a>
+            </div>
+            <!-- Mobile menu button -->
+            <button class="md:hidden text-cyan-400" onclick="document.getElementById('mobileMenu').classList.toggle('hidden')">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+        </div>
+        <!-- Mobile menu -->
+        <div id="mobileMenu" class="hidden md:hidden px-4 pb-4 space-y-2 text-sm font-mono">
+            <a href="#inicio" class="block hover:text-cyan-400 py-1">01.INICIO</a>
+            <a href="#historia" class="block hover:text-cyan-400 py-1">02.HISTORIA</a>
+            <a href="#tipo" class="block hover:text-cyan-400 py-1">03.TIPO</a>
+            <a href="#sintaxis" class="block hover:text-cyan-400 py-1">04.SINTAXIS</a>
+            <a href="#modulos" class="block hover:text-cyan-400 py-1">05.MÓDULOS</a>
+            <a href="#compilador" class="block hover:text-cyan-400 py-1">06.COMPILADOR</a>
+            <a href="#ejemplo" class="block hover:text-cyan-400 py-1">07.EJEMPLO</a>
+            <a href="#legado" class="block hover:text-cyan-400 py-1">08.LEGADO</a>
+        </div>
+    </nav>
+
+    <!-- ============================================================ -->
+    <!-- HERO SECTION -->
+    <!-- ============================================================ -->
+    <section id="inicio" class="flex items-center justify-center relative overflow-hidden">
+        <div class="absolute inset-0 opacity-20">
+            <div class="absolute top-20 left-20 w-72 h-72 bg-cyan-500 rounded-full filter blur-3xl animate-pulse"></div>
+            <div class="absolute bottom-20 right-20 w-96 h-96 bg-fuchsia-500 rounded-full filter blur-3xl animate-pulse" style="animation-delay:1s"></div>
+            <div class="absolute top-1/2 left-1/2 w-64 h-64 bg-blue-600 rounded-full filter blur-3xl animate-pulse" style="animation-delay:2s"></div>
+        </div>
+        
+        <div class="relative z-10 text-center max-w-5xl mx-auto px-4">
+            <div class="mb-6 inline-block px-4 py-1 rounded-full border border-cyan-500/50 bg-cyan-500/10 text-cyan-400 font-mono text-sm tracking-widest">
+                LENGUAJE DE PROGRAMACIÓN &bull; 1978
+            </div>
+            <h1 class="font-cyber text-6xl md:text-8xl font-black mb-6 leading-tight">
+                <span class="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600 neon-text">MODULA-2</span>
+                <span class="block text-2xl md:text-4xl mt-4 text-gray-400 font-light tracking-widest">EL ARQUITECTO DEL SOFTWARE MODULAR</span>
+            </h1>
+            <div class="h-16 flex justify-center items-center">
+                <p class="typewriter font-mono text-lg md:text-xl text-cyan-300 max-w-2xl mx-auto">
+                    "De la mente de Niklaus Wirth nació la revolución de la encapsulación..."
+                </p>
+            </div>
+            <div class="mt-12 flex gap-4 justify-center flex-wrap">
+                <div class="px-6 py-3 border border-cyan-500/30 rounded-lg bg-cyan-500/5 font-mono text-cyan-400">
+                    1978
+                </div>
+                <div class="px-6 py-3 border border-fuchsia-500/30 rounded-lg bg-fuchsia-500/5 font-mono text-fuchsia-400">
+                    ETH Zürich
+                </div>
+                <div class="px-6 py-3 border border-yellow-500/30 rounded-lg bg-yellow-500/5 font-mono text-yellow-400">
+                    Niklaus Wirth
+                </div>
+                <div class="px-6 py-3 border border-green-500/30 rounded-lg bg-green-500/5 font-mono text-green-400">
+                    Lilith Workstation
+                </div>
+            </div>
+
+            <div class="mt-8 text-gray-500 text-sm font-mono">
+                Josh &bull; Adrián &bull; Jose &mdash; Grupo 4
+            </div>
+        </div>
+        
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+            </svg>
+        </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- EXTENDED HISTORY SECTION -->
+    <!-- ============================================================ -->
+    <section id="historia" class="bg-black/40 fade-section">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="font-cyber text-4xl md:text-5xl font-bold mb-8 text-center">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-500">HISTORIA Y GÉNESIS</span>
+            </h2>
+            <p class="text-center text-gray-400 mb-16 text-lg max-w-3xl mx-auto">
+                El nacimiento de Modula-2 no fue un accidente, sino la respuesta a necesidades específicas 
+                de la ingeniería de software de los años 70, gestado en el prestigioso ETH Zürich.
+            </p>
+
+            <!-- Contexto de la Época -->
+            <div class="mb-16">
+                <h3 class="font-cyber text-2xl md:text-3xl text-cyan-400 mb-8 flex items-center gap-3">
+                    <span class="w-10 h-10 rounded bg-cyan-500/20 flex items-center justify-center text-lg">&#128197;</span>
+                    El Contexto: Crisis del Software (1970s)
+                </h3>
+                
+                <div class="grid lg:grid-cols-2 gap-8 mb-8">
+                    <div class="history-card p-8 rounded-2xl">
+                        <h4 class="text-xl font-bold text-white mb-4">La Problemática</h4>
+                        <p class="text-gray-300 leading-relaxed mb-4">
+                            A finales de los años 70, la industria del software enfrentaba lo que se llamó la 
+                            <strong class="text-cyan-300">"Crisis del Software"</strong>. Los programas crecían en complejidad hasta 
+                            volverse inmantenibles. Los lenguajes existentes (C, Fortran, Pascal puro) no 
+                            proporcionaban mecanismos adecuados para estructurar programas grandes.
+                        </p>
+                        <p class="text-gray-300 leading-relaxed">
+                            La programación estructurada había resuelto el problema del "código espagueti" 
+                            eliminando el GOTO, pero no abordaba la <strong class="text-cyan-300">organización a gran escala</strong> 
+                            del software. Se necesitaba un nuevo paradigma.
+                        </p>
+                    </div>
+                    
+                    <div class="history-card p-8 rounded-2xl">
+                        <h4 class="text-xl font-bold text-white mb-4">Niklaus Wirth: El Arquitecto</h4>
+                        <div class="bg-gradient-to-br from-cyan-900/30 to-fuchsia-900/20 h-32 rounded-lg mb-4 flex items-center justify-center border border-cyan-500/20">
+                            <div class="text-center">
+                                <div class="text-5xl mb-2">&#129489;&#8205;&#128187;</div>
+                                <div class="text-cyan-400 font-mono text-xs">Prof. Niklaus Wirth (1934–2024)</div>
+                            </div>
+                        </div>
+                        <p class="text-gray-300 leading-relaxed">
+                            <strong class="text-white">Prof. Niklaus Wirth</strong> (1934–2024), catedrático en el 
+                            <em>Eidgenössische Technische Hochschule Zürich (ETH Zürich)</em>, ya había 
+                            creado Pascal en 1970. Sin embargo, Pascal era un lenguaje educativo para 
+                            enseñar programación estructurada, no para construir sistemas operativos 
+                            industriales.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- De Pascal a Modula-2 -->
+                <div class="bg-gradient-to-r from-cyan-900/20 to-fuchsia-900/20 border border-cyan-500/20 rounded-2xl p-8 mb-8">
+                    <h4 class="font-cyber text-xl text-yellow-400 mb-4">La Transición: De Pascal a Modula-2</h4>
+                    <p class="text-gray-300 leading-relaxed mb-6">
+                        Pascal fue creado como lenguaje educativo. Sin embargo, carecía de mecanismos para compilación 
+                        separada de módulos, acceso a hardware de bajo nivel y concurrencia. Wirth, en vez de 
+                        <strong class="text-yellow-300">"parchear" Pascal</strong>, decidió diseñar un lenguaje completamente nuevo 
+                        que conservara la elegancia de Pascal pero añadiera capacidades industriales.
+                    </p>
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div class="p-4 rounded-xl bg-black/30 border border-red-500/20 text-center">
+                            <div class="text-red-400 font-cyber text-sm mb-2">PASCAL (1970)</div>
+                            <div class="text-xs text-gray-400">Educativo, sin módulos, sin acceso a hardware, sin compilación separada</div>
+                        </div>
+                        <div class="flex items-center justify-center text-cyan-400 text-3xl font-bold">&#8594;</div>
+                        <div class="p-4 rounded-xl bg-black/30 border border-green-500/20 text-center">
+                            <div class="text-green-400 font-cyber text-sm mb-2">MODULA-2 (1978)</div>
+                            <div class="text-xs text-gray-400">Industrial, modular, acceso a bajo nivel, coroutines, compilación separada</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Motivación: Lilith -->
+                <div class="bg-gradient-to-r from-yellow-900/15 to-cyan-900/15 border border-yellow-500/20 rounded-2xl p-8 mb-8">
+                    <h4 class="font-cyber text-xl text-yellow-400 mb-4">La Motivación Directa: El Proyecto Lilith</h4>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <p class="text-gray-300 leading-relaxed mb-4">
+                                En 1977, Wirth y su equipo en el ETH Zürich comenzaron el diseño de 
+                                <strong class="text-yellow-300">Lilith</strong>, una estación de trabajo personal (workstation) 
+                                con interfaz gráfica, mouse y red Ethernet — años antes de que Apple 
+                                lanzara la Macintosh.
+                            </p>
+                            <p class="text-gray-300 leading-relaxed mb-4">
+                                Necesitaban un sistema operativo completo (<strong>Medos</strong>) y software de sistema, 
+                                pero <strong class="text-yellow-300">ningún lenguaje existente satisfacía sus necesidades</strong>:
+                            </p>
+                            <div class="space-y-2 text-gray-400 text-sm">
+                                <div class="flex items-start gap-2">
+                                    <span class="text-red-400">&#10007;</span>
+                                    <span><strong class="text-white">Pascal:</strong> Sin módulos, sin acceso a hardware</span>
+                                </div>
+                                <div class="flex items-start gap-2">
+                                    <span class="text-red-400">&#10007;</span>
+                                    <span><strong class="text-white">C:</strong> Tipado débil, sin encapsulación formal</span>
+                                </div>
+                                <div class="flex items-start gap-2">
+                                    <span class="text-red-400">&#10007;</span>
+                                    <span><strong class="text-white">Simula:</strong> Demasiado complejo, orientado a simulación</span>
+                                </div>
+                                <div class="flex items-start gap-2">
+                                    <span class="text-red-400">&#10007;</span>
+                                    <span><strong class="text-white">Ada:</strong> Aún en desarrollo, demasiado pesado</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-br from-gray-900/80 to-gray-800/40 rounded-xl p-6 flex flex-col items-center justify-center border border-yellow-500/20">
+                            <div class="text-6xl mb-4">&#128421;&#65039;</div>
+                            <div class="text-center">
+                                <div class="text-yellow-400 font-bold font-cyber text-lg">Computadora Lilith</div>
+                                <div class="text-xs text-gray-500 mt-3 space-y-1">
+                                    <div>Procesador AMD Am2901 (bit-slice)</div>
+                                    <div>256 KB RAM</div>
+                                    <div>Disco de 10 MB</div>
+                                    <div>Display 640&times;480 B&amp;W</div>
+                                    <div>Mouse &amp; GUI</div>
+                                    <div>Ethernet 3 Mbps</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Línea de Tiempo Detallada -->
+            <div class="mb-16">
+                <h3 class="font-cyber text-2xl md:text-3xl text-fuchsia-400 mb-8 flex items-center gap-3">
+                    <span class="w-10 h-10 rounded bg-fuchsia-500/20 flex items-center justify-center text-lg">&#9201;</span>
+                    Cronología de Desarrollo
+                </h3>
+
+                <div class="space-y-8">
+                    <!-- 1977 -->
+                    <div class="timeline-item">
+                        <div class="font-cyber text-3xl text-cyan-400 mb-2">1977</div>
+                        <div class="bg-gray-900/50 p-6 rounded-xl border border-gray-800">
+                            <h4 class="text-xl font-bold text-white mb-3">Los Orígenes: Modula Experimental</h4>
+                            <p class="text-gray-300 leading-relaxed mb-3">
+                                Wirth comienza a experimentar con extensiones modulares para Pascal. 
+                                El primer borrador, llamado simplemente <strong>"Modula"</strong>, 
+                                introduce el concepto de módulos pero aún mantiene muchas limitaciones 
+                                de Pascal.
+                            </p>
+                            <div class="grid md:grid-cols-2 gap-4 mt-4">
+                                <div class="p-4 rounded bg-black/30 border border-cyan-500/20">
+                                    <div class="text-cyan-400 text-sm font-bold mb-2">Innovación Clave</div>
+                                    <div class="text-gray-400 text-sm">Separación sintáctica entre interfaz e implementación</div>
+                                </div>
+                                <div class="p-4 rounded bg-black/30 border border-cyan-500/20">
+                                    <div class="text-cyan-400 text-sm font-bold mb-2">Ubicación</div>
+                                    <div class="text-gray-400 text-sm">Instituto de Informática, ETH Zürich, Suiza</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 1978 -->
+                    <div class="timeline-item">
+                        <div class="font-cyber text-3xl text-fuchsia-400 mb-2 neon-pink-text">1978</div>
+                        <div class="bg-gray-900/50 p-6 rounded-xl border border-fuchsia-800/50">
+                            <h4 class="text-xl font-bold text-white mb-3">&#127881; Nace Modula-2</h4>
+                            <p class="text-gray-300 leading-relaxed mb-3">
+                                Wirth decide no "parchear" Pascal, sino diseñar un nuevo lenguaje desde cero. 
+                                <strong class="text-fuchsia-300">Modula-2</strong> se define formalmente como un lenguaje que introduce 
+                                por primera vez el concepto de <em>módulo</em> (porción independiente de un programa) y 
+                                <em>encapsulación</em> (restricción del acceso directo a componentes internos).
+                            </p>
+                            <p class="text-gray-300 leading-relaxed mb-3">
+                                Del código contenido en un módulo, solo se brinda una interfaz pública definida como 
+                                <strong>DEFINITION MODULE</strong>; el resto permanece oculto (encapsulado) en el 
+                                <strong>IMPLEMENTATION MODULE</strong>.
+                            </p>
+                            <div class="code-block mt-4">
+                                <div class="code-header">
+                                    <span class="text-sm text-gray-400 font-mono">primer_ejemplo.mod (1978)</span>
+                                </div>
+                                <pre><code class="language-delphi">(* Primer programa escrito en Modula-2 
+   por Niklaus Wirth, ETH Zürich, 1978 *)
+MODULE Hello;
+FROM Terminal IMPORT WriteString;
+BEGIN
+    WriteString("Modula-2 is born!");
+END Hello.</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 1980-1982 -->
+                    <div class="timeline-item">
+                        <div class="font-cyber text-3xl text-yellow-400 mb-2">1980–1982</div>
+                        <div class="bg-gray-900/50 p-6 rounded-xl border border-gray-800">
+                            <h4 class="text-xl font-bold text-white mb-3">Implementación en Lilith</h4>
+                            <p class="text-gray-300 leading-relaxed mb-3">
+                                Se completa el primer compilador de Modula-2, escrito... &#161;en Modula-2! 
+                                Utilizando bootstrapping desde Pascal. El sistema operativo <strong class="text-yellow-300">Medos</strong> 
+                                (Modular Embedded Disk Operating System) se escribe completamente en Modula-2. 
+                                Esta transición de Pascal a Modula-2 fue como pasar de aprender a hacer funciones 
+                                a aprender a diseñar sistemas completos.
+                            </p>
+                            <div class="grid md:grid-cols-3 gap-4 mt-4">
+                                <div class="text-center p-4 rounded bg-yellow-900/20 border border-yellow-500/30">
+                                    <div class="text-3xl mb-2">&#128190;</div>
+                                    <div class="text-yellow-400 font-bold text-sm">Medos-2</div>
+                                    <div class="text-xs text-gray-400">Sistema Operativo</div>
+                                </div>
+                                <div class="text-center p-4 rounded bg-yellow-900/20 border border-yellow-500/30">
+                                    <div class="text-3xl mb-2">&#128433;&#65039;</div>
+                                    <div class="text-yellow-400 font-bold text-sm">Mesa</div>
+                                    <div class="text-xs text-gray-400">Entorno GUI con Mouse</div>
+                                </div>
+                                <div class="text-center p-4 rounded bg-yellow-900/20 border border-yellow-500/30">
+                                    <div class="text-3xl mb-2">&#127760;</div>
+                                    <div class="text-yellow-400 font-bold text-sm">Red Lilith</div>
+                                    <div class="text-xs text-gray-400">3 Mbps Ethernet</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 1985 -->
+                    <div class="timeline-item">
+                        <div class="font-cyber text-3xl text-green-400 mb-2">1985</div>
+                        <div class="bg-gray-900/50 p-6 rounded-xl border border-gray-800">
+                            <h4 class="text-xl font-bold text-white mb-3">&#128214; Publicación del Libro Definitivo</h4>
+                            <p class="text-gray-300 leading-relaxed">
+                                Wirth publica <em>"Programming in Modula-2"</em> (Springer-Verlag), 
+                                la biblia del lenguaje. Define la sintaxis definitiva (PIM2 — Programming 
+                                in Modula-2, 2nd edition). El libro se convierte en texto de referencia 
+                                en universidades de todo el mundo.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 1988 -->
+                    <div class="timeline-item">
+                        <div class="font-cyber text-3xl text-purple-400 mb-2">1988</div>
+                        <div class="bg-gray-900/50 p-6 rounded-xl border border-gray-800">
+                            <h4 class="text-xl font-bold text-white mb-3">Estandarización ISO</h4>
+                            <p class="text-gray-300 leading-relaxed mb-3">
+                                Modula-2 se estandariza internacionalmente como <strong class="text-purple-300">ISO/IEC 10514-1</strong>. 
+                                Se definen bibliotecas estándar y se eliminan ambigüedades del lenguaje original.
+                            </p>
+                            <div class="p-4 rounded bg-purple-900/20 border border-purple-500/30">
+                                <div class="text-purple-400 text-sm font-bold mb-2">Cambios Importantes en ISO</div>
+                                <div class="text-gray-400 text-sm space-y-1">
+                                    <div>&#8226; Separación de módulos de biblioteca en DEF/IMP</div>
+                                    <div>&#8226; Tipos CARDINAL e INTEGER unificados</div>
+                                    <div>&#8226; Bibliotecas estándar: InOut, RealInOut, Strings, etc.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 1990s -->
+                    <div class="timeline-item">
+                        <div class="font-cyber text-3xl text-gray-400 mb-2">1990s</div>
+                        <div class="bg-gray-900/50 p-6 rounded-xl border border-gray-800">
+                            <h4 class="text-xl font-bold text-white mb-3">Era Dorada y Competencia</h4>
+                            <p class="text-gray-300 leading-relaxed">
+                                Modula-2 se usa extensamente en enseñanza y sistemas embebidos. Sin embargo, 
+                                C++ y Java comienzan a dominar la industria. Wirth crea <strong class="text-gray-200">Oberon</strong> (1986) como 
+                                sucesor simplificado, pero Modula-2 sigue vivo en nichos industriales y educativos.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 2000s -->
+                    <div class="timeline-item">
+                        <div class="font-cyber text-3xl text-orange-400 mb-2">2000–2010</div>
+                        <div class="bg-gray-900/50 p-6 rounded-xl border border-gray-800">
+                            <h4 class="text-xl font-bold text-white mb-3">GNU Modula-2: El Renacimiento</h4>
+                            <p class="text-gray-300 leading-relaxed">
+                                Gaius Mulley comienza el proyecto <strong class="text-orange-300">GNU Modula-2 (GM2)</strong>, 
+                                un front-end de GCC para compilar Modula-2. El objetivo: preservar el 
+                                legado y proporcionar un compilador industrial moderno, libre y multiplataforma.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 2024 -->
+                    <div class="timeline-item">
+                        <div class="font-cyber text-3xl text-cyan-400 mb-2 neon-text">2024</div>
+                        <div class="bg-gray-900/50 p-6 rounded-xl border border-cyan-800/50">
+                            <h4 class="text-xl font-bold text-white mb-3">&#127881; Integración en GCC 15</h4>
+                            <p class="text-gray-300 leading-relaxed mb-3">
+                                Después de 25 años de desarrollo, GM2 se integra oficialmente en la colección 
+                                de compiladores GNU. Modula-2 vuelve a ser un lenguaje "de primera clase" 
+                                con soporte en Linux, macOS, Windows y arquitecturas embebidas.
+                            </p>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="p-4 rounded bg-cyan-900/20 border border-cyan-500/30">
+                                    <div class="text-cyan-400 font-bold mb-2">Dialectos Soportados</div>
+                                    <div class="text-sm text-gray-400">PIM2, PIM3, PIM4, ISO, M2R10 (en desarrollo)</div>
+                                </div>
+                                <div class="p-4 rounded bg-cyan-900/20 border border-cyan-500/30">
+                                    <div class="text-cyan-400 font-bold mb-2">Arquitecturas</div>
+                                    <div class="text-sm text-gray-400">x86_64, ARM, RISC-V, MIPS, SPARC</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quote -->
+            <div class="max-w-3xl mx-auto text-center p-8 rounded-2xl bg-gradient-to-r from-cyan-900/20 to-fuchsia-900/20 border border-cyan-500/30">
+                <svg class="w-12 h-12 text-cyan-400 mx-auto mb-4 opacity-50" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
+                </svg>
+                <p class="text-xl text-gray-300 italic mb-4">
+                    "Modula-2 nació de la necesidad de construir sistemas, no solo programas. 
+                    Fue diseñado para que un equipo de programadores pudiera trabajar en un 
+                    proyecto grande sin pisarse los unos a los otros."
+                </p>
+                <div class="text-cyan-400 font-cyber">— Niklaus Wirth, 1984</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- LANGUAGE TYPE SECTION -->
+    <!-- ============================================================ -->
+    <section id="tipo" class="fade-section">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="font-cyber text-4xl md:text-5xl font-bold mb-4 text-center">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-cyan-500">TIPO DE LENGUAJE</span>
+            </h2>
+            <p class="text-center text-gray-400 mb-16 text-lg">Clasificación multi-paradigma con justificación técnica</p>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Imperativo -->
+                <div class="feature-card p-8 rounded-2xl relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full filter blur-3xl group-hover:bg-cyan-500/20 transition-all"></div>
+                    <div class="relative z-10">
+                        <div class="w-16 h-16 rounded-xl bg-cyan-500/20 flex items-center justify-center mb-6 border border-cyan-500/50">
+                            <svg class="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                        </div>
+                        <h3 class="font-cyber text-2xl font-bold text-white mb-4">IMPERATIVO</h3>
+                        <p class="text-gray-400 mb-4 text-sm leading-relaxed">
+                            Su modelo de ejecución está basado en la modificación explícita del estado 
+                            mediante secuencias de instrucciones. El programador describe <strong class="text-white">cómo</strong> hacer las cosas paso a paso.
+                        </p>
+                        <div class="font-mono text-xs text-cyan-400 bg-cyan-950/30 p-3 rounded border border-cyan-500/20">
+                            x := 10;<br>
+                            y := x + 5;<br>
+                            WriteInt(y, 3);
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estructurado -->
+                <div class="feature-card p-8 rounded-2xl relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-fuchsia-500/10 rounded-full filter blur-3xl group-hover:bg-fuchsia-500/20 transition-all"></div>
+                    <div class="relative z-10">
+                        <div class="w-16 h-16 rounded-xl bg-fuchsia-500/20 flex items-center justify-center mb-6 border border-fuchsia-500/50">
+                            <svg class="w-8 h-8 text-fuchsia-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                            </svg>
+                        </div>
+                        <h3 class="font-cyber text-2xl font-bold text-white mb-4">ESTRUCTURADO</h3>
+                        <p class="text-gray-400 mb-4 text-sm leading-relaxed">
+                            Utiliza estructuras de control bien definidas y bloques delimitados con <code class="text-fuchsia-300">BEGIN/END</code> que 
+                            evitan saltos arbitrarios. <strong class="text-white">Prohibición absoluta</strong> de GOTO arbitrario.
+                        </p>
+                        <div class="font-mono text-xs text-fuchsia-400 bg-fuchsia-950/30 p-3 rounded border border-fuchsia-500/20">
+                            IF cond THEN<br>
+                            &nbsp;&nbsp;accion1<br>
+                            ELSIF cond2 THEN<br>
+                            &nbsp;&nbsp;accion2<br>
+                            END;
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modular -->
+                <div class="feature-card p-8 rounded-2xl relative overflow-hidden group ring-2 ring-cyan-500/50">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-yellow-500/20 rounded-full filter blur-3xl animate-pulse"></div>
+                    <div class="absolute -top-4 -right-4 bg-cyan-500 text-black text-xs font-bold px-3 py-1 rounded-full">CARACTERÍSTICA CLAVE</div>
+                    <div class="relative z-10">
+                        <div class="w-16 h-16 rounded-xl bg-yellow-500/20 flex items-center justify-center mb-6 border border-yellow-500/50">
+                            <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                            </svg>
+                        </div>
+                        <h3 class="font-cyber text-2xl font-bold text-white mb-4">MODULAR</h3>
+                        <p class="text-gray-400 mb-4 text-sm leading-relaxed">
+                            Permite dividir el programa en módulos independientes con separación formal entre 
+                            <strong class="text-yellow-300">DEFINITION MODULE</strong> (interfaz) e <strong class="text-yellow-300">IMPLEMENTATION MODULE</strong>, 
+                            controlando explícitamente qué se exporta y qué permanece oculto.
+                        </p>
+                        <div class="font-mono text-xs text-yellow-400 bg-yellow-950/30 p-3 rounded border border-yellow-500/20">
+                            DEFINITION MODULE Stack;<br>
+                            PROCEDURE Push(c: CHAR);<br>
+                            END Stack.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fuertemente Tipado -->
+                <div class="feature-card p-8 rounded-2xl relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full filter blur-3xl group-hover:bg-green-500/20 transition-all"></div>
+                    <div class="relative z-10">
+                        <div class="w-16 h-16 rounded-xl bg-green-500/20 flex items-center justify-center mb-6 border border-green-500/50">
+                            <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="font-cyber text-2xl font-bold text-white mb-4">FUERTEMENTE TIPADO</h3>
+                        <p class="text-gray-400 mb-4 text-sm leading-relaxed">
+                            Exige declaración explícita de tipos. Prohíbe operaciones entre tipos incompatibles 
+                            sin conversión explícita. Verificación estricta en tiempo de compilación.
+                        </p>
+                        <div class="font-mono text-xs text-green-400 bg-green-950/30 p-3 rounded border border-green-500/20">
+                            VAR<br>
+                            &nbsp;&nbsp;edad: INTEGER;<br>
+                            &nbsp;&nbsp;nombre: ARRAY [0..31] OF CHAR;<br>
+                            (* Error: edad := nombre *)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Procedimental -->
+                <div class="feature-card p-8 rounded-2xl relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full filter blur-3xl group-hover:bg-purple-500/20 transition-all"></div>
+                    <div class="relative z-10">
+                        <div class="w-16 h-16 rounded-xl bg-purple-500/20 flex items-center justify-center mb-6 border border-purple-500/50">
+                            <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                            </svg>
+                        </div>
+                        <h3 class="font-cyber text-2xl font-bold text-white mb-4">PROCEDIMENTAL</h3>
+                        <p class="text-gray-400 mb-4 text-sm leading-relaxed">
+                            Organización en procedimientos que encapsulan acciones específicas. 
+                            Soporte para procedimientos anidados y parámetros VAR (por referencia).
+                        </p>
+                        <div class="font-mono text-xs text-purple-400 bg-purple-950/30 p-3 rounded border border-purple-500/20">
+                            PROCEDURE Swap(VAR a,b: INTEGER);<br>
+                            VAR temp: INTEGER;<br>
+                            BEGIN<br>
+                            &nbsp;&nbsp;temp := a; a := b; b := temp;<br>
+                            END Swap;
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sistemas -->
+                <div class="feature-card p-8 rounded-2xl relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-red-500/10 rounded-full filter blur-3xl group-hover:bg-red-500/20 transition-all"></div>
+                    <div class="relative z-10">
+                        <div class="w-16 h-16 rounded-xl bg-red-500/20 flex items-center justify-center mb-6 border border-red-500/50">
+                            <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="font-cyber text-2xl font-bold text-white mb-4">ORIENTADO A SISTEMAS</h3>
+                        <p class="text-gray-400 mb-4 text-sm leading-relaxed">
+                            Diseñado para desarrollo de SO, compiladores y drivers. Control sobre memoria, 
+                            soporte para concurrencia (coroutines) y modularidad para sistemas complejos.
+                        </p>
+                        <div class="font-mono text-xs text-red-400 bg-red-950/30 p-3 rounded border border-red-500/20">
+                            FROM SYSTEM IMPORT ADDRESS;<br>
+                            FROM COROUTINES IMPORT TRANSFER;
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NOT OOP clarification -->
+            <div class="mt-12 max-w-4xl mx-auto p-6 rounded-2xl bg-gradient-to-r from-orange-900/20 to-red-900/20 border border-orange-500/30">
+                <h4 class="font-cyber text-lg text-orange-400 mb-3">&#9888;&#65039; ¿Es Modula-2 Orientado a Objetos?</h4>
+                <p class="text-gray-300 text-sm leading-relaxed">
+                    <strong class="text-white">No.</strong> El concepto de módulo constituye el <em>antecedente</em> de las clases 
+                    que se observan en la POO moderna; sin embargo, la incapacidad de declarar múltiples instancias 
+                    de los módulos, así como la ausencia de todo tipo de herencia, impiden afirmar que Modula-2 sea 
+                    un lenguaje orientado a objetos. No obstante, se puede <strong class="text-orange-300">aproximar la herencia 
+                    mediante composición</strong> usando RECORDs anidados.
+                </p>
+                <div class="code-block mt-4" style="border-color: rgba(249,115,22,0.3)">
+                    <div class="code-header">
+                        <span class="text-sm text-orange-400 font-mono">simulacion_herencia.mod</span>
+                    </div>
+                    <pre><code class="language-delphi">(* Simulación de Herencia con Composición *)
+TYPE
+    Persona = RECORD
+        edad : INTEGER;
+    END;
+
+    Estudiante = RECORD
+        datosPersona : Persona;  (* "hereda" de Persona *)
+        carnet : INTEGER;
+    END;</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SYNTAX SECTION -->
+    <!-- ============================================================ -->
+    <section id="sintaxis" class="bg-black/40 fade-section">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="font-cyber text-4xl md:text-5xl font-bold mb-4 text-center">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-500">SINTAXIS Y SEMÁNTICA</span>
+            </h2>
+            <p class="text-center text-gray-400 mb-12 text-lg">Elementos del lenguaje con ejemplos claros</p>
+            
+            <!-- Variables y Tipos -->
+            <div class="mb-16">
+                <h3 class="font-cyber text-2xl md:text-3xl text-cyan-400 mb-6 flex items-center gap-3">
+                    <span class="w-8 h-8 rounded bg-cyan-500/20 flex items-center justify-center text-sm font-mono">01</span>
+                    Variables y Tipos de Datos
+                </h3>
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <div class="code-block">
+                        <div class="code-header">
+                            <div class="code-dot dot-red"></div>
+                            <div class="code-dot dot-yellow"></div>
+                            <div class="code-dot dot-green"></div>
+                            <span class="ml-4 text-sm text-gray-400 font-mono">declaraciones.mod</span>
+                        </div>
+                        <pre><code class="language-delphi">(* DECLARACIÓN DE VARIABLES Y TIPOS *)
+MODULE VariablesDemo;
+FROM InOut IMPORT WriteString, WriteInt, WriteLn;
+
+TYPE
+    DiaSemana = (Lunes, Martes, Miercoles, 
+                 Jueves, Viernes, Sabado, Domingo);
+    RangoEdad = [18..65];
+    
+    Persona = RECORD
+        nombre: ARRAY [0..50] OF CHAR;
+        edad: INTEGER;
+        activo: BOOLEAN;
+    END;
+    
+    Vector = ARRAY [1..10] OF INTEGER;
+
+VAR
+    contador: INTEGER;
+    salario: REAL;
+    inicial: CHAR;
+    esValido: BOOLEAN;
+    dias: SET OF DiaSemana;
+    persona1: Persona;
+
+BEGIN
+    contador := 42;
+    salario := 2500.50;
+    inicial := 'M';
+    esValido := TRUE;
+    dias := DiaSemana{Lunes, Viernes};
+    
+    persona1.nombre := "Juan Perez";
+    persona1.edad := 25;
+    persona1.activo := TRUE;
+    
+    WriteString("Contador: ");
+    WriteInt(contador, 5);
+    WriteLn;
+END VariablesDemo.</code></pre>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="p-6 rounded-xl bg-gray-900/50 border border-gray-700">
+                            <h4 class="text-cyan-400 font-bold mb-3 font-cyber">REGLAS SEMÁNTICAS</h4>
+                            <div class="space-y-2 text-gray-300 text-sm">
+                                <div class="flex items-start gap-2">
+                                    <span class="text-cyan-500 mt-1">&#9656;</span>
+                                    <span>Todas las variables deben declararse antes de uso</span>
+                                </div>
+                                <div class="flex items-start gap-2">
+                                    <span class="text-cyan-500 mt-1">&#9656;</span>
+                                    <span>Tipos incompatibles generan error de compilación</span>
+                                </div>
+                                <div class="flex items-start gap-2">
+                                    <span class="text-cyan-500 mt-1">&#9656;</span>
+                                    <span>Los índices de arrays se verifican en runtime (opcional)</span>
+                                </div>
+                                <div class="flex items-start gap-2">
+                                    <span class="text-cyan-500 mt-1">&#9656;</span>
+                                    <span>Los conjuntos (SET) son tipos de primera clase</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="p-6 rounded-xl bg-gradient-to-r from-cyan-900/20 to-transparent border border-cyan-500/30">
+                            <h4 class="text-fuchsia-400 font-bold mb-2 font-cyber">TIPOS PERVASIVOS</h4>
+                            <p class="text-gray-400 text-sm mb-3">Disponibles sin importar:</p>
+                            <div class="grid grid-cols-2 gap-2 font-mono text-xs">
+                                <div class="text-cyan-300">INTEGER</div>
+                                <div class="text-cyan-300">CARDINAL</div>
+                                <div class="text-cyan-300">REAL</div>
+                                <div class="text-cyan-300">LONGREAL</div>
+                                <div class="text-cyan-300">BOOLEAN</div>
+                                <div class="text-cyan-300">CHAR</div>
+                                <div class="text-cyan-300">BITSET</div>
+                                <div class="text-cyan-300">ADDRESS</div>
+                            </div>
+                        </div>
+
+                        <div class="p-6 rounded-xl bg-gray-900/50 border border-gray-700">
+                            <h4 class="text-yellow-400 font-bold mb-3 font-cyber">OPERADORES</h4>
+                            <div class="grid grid-cols-2 gap-2 font-mono text-xs">
+                                <div><span class="text-cyan-300">+  -  *</span> <span class="text-gray-500">aritméticos</span></div>
+                                <div><span class="text-cyan-300">DIV  MOD</span> <span class="text-gray-500">enteros</span></div>
+                                <div><span class="text-cyan-300">=  #  &lt;  &gt;</span> <span class="text-gray-500">comparación</span></div>
+                                <div><span class="text-cyan-300">AND OR NOT</span> <span class="text-gray-500">lógicos</span></div>
+                                <div><span class="text-cyan-300">+  -  *</span> <span class="text-gray-500">conjuntos</span></div>
+                                <div><span class="text-cyan-300">:=</span> <span class="text-gray-500">asignación</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estructuras de Control -->
+            <div class="mb-16">
+                <h3 class="font-cyber text-2xl md:text-3xl text-fuchsia-400 mb-6 flex items-center gap-3">
+                    <span class="w-8 h-8 rounded bg-fuchsia-500/20 flex items-center justify-center text-sm font-mono">02</span>
+                    Estructuras de Control
+                </h3>
+                
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="text-sm text-gray-400 font-mono">condicionales.mod</span>
+                        </div>
+                        <pre><code class="language-delphi">(* ESTRUCTURAS CONDICIONALES *)
+
+IF (edad >= 18) AND (edad <= 65) THEN
+    WriteString("Adulto activo");
+    WriteLn;
+ELSIF edad > 65 THEN
+    WriteString("Adulto mayor");
+    WriteLn;
+ELSE
+    WriteString("Menor de edad");
+    WriteLn;
+END;
+
+(* CASE - Selector múltiple *)
+CASE dia OF
+    Lunes:
+        WriteString("Inicio de semana");
+    | Martes, Miercoles, Jueves:
+        WriteString("Mitad de semana");
+    | Viernes:
+        WriteString("Fin de semana!");
+ELSE
+    WriteString("Fin de semana");
+END;</code></pre>
+                    </div>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="text-sm text-gray-400 font-mono">ciclos.mod</span>
+                        </div>
+                        <pre><code class="language-delphi">(* CICLOS EN MODULA-2 *)
+
+(* FOR - Ciclo contador *)
+FOR i := 1 TO 5 DO
+    WriteString("Valor de i = ");
+    WriteInt(i, 3);
+    WriteLn;
+END;
+
+(* WHILE - Pre-condición *)
+x := 1;
+WHILE x <= 3 DO
+    WriteString("Valor de x = ");
+    WriteInt(x, 3);
+    WriteLn;
+    x := x + 1;
+END;
+
+(* REPEAT - Post-condición *)
+x := 1;
+REPEAT
+    WriteString("Valor de x = ");
+    WriteInt(x, 3);
+    WriteLn;
+    x := x + 1;
+UNTIL x > 3;
+
+(* LOOP - Infinito con EXIT *)
+LOOP
+    LeerComando;
+    IF cmd = 'Q' THEN EXIT; END;
+    EjecutarComando;
+END;</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Procedimientos y Funciones -->
+            <div class="mb-16">
+                <h3 class="font-cyber text-2xl md:text-3xl text-yellow-400 mb-6 flex items-center gap-3">
+                    <span class="w-8 h-8 rounded bg-yellow-500/20 flex items-center justify-center text-sm font-mono">03</span>
+                    Procedimientos y Funciones
+                </h3>
+                
+                <div class="code-block mb-6">
+                    <div class="code-header">
+                        <span class="text-sm text-gray-400 font-mono">procedimientos.mod</span>
+                    </div>
+                    <pre><code class="language-delphi">MODULE ProcedimientosDemo;
+FROM InOut IMPORT WriteString, WriteInt, WriteLn;
+
+(* Procedimiento simple sin parámetros *)
+PROCEDURE Saludar;
+BEGIN
+    WriteString("Hola desde un procedimiento.");
+    WriteLn;
+END Saludar;
+
+(* Procedimiento con parámetro por valor *)
+PROCEDURE MostrarNumero(n : INTEGER);
+BEGIN
+    WriteString("El numero recibido es: ");
+    WriteInt(n, 3);
+    WriteLn;
+END MostrarNumero;
+
+(* Función con valor de retorno *)
+PROCEDURE Sumar(a, b : INTEGER) : INTEGER;
+BEGIN
+    RETURN a + b;
+END Sumar;
+
+(* Procedimiento con VAR - por referencia *)
+PROCEDURE Incrementar(VAR valor: INTEGER; cantidad: INTEGER);
+BEGIN
+    valor := valor + cantidad;
+END Incrementar;
+
+(* Función recursiva *)
+PROCEDURE Factorial(n: INTEGER): INTEGER;
+BEGIN
+    IF n <= 1 THEN
+        RETURN 1;
+    ELSE
+        RETURN n * Factorial(n - 1);
+    END;
+END Factorial;
+
+VAR
+    num, resultado: INTEGER;
+
+BEGIN
+    Saludar;
+    MostrarNumero(25);
+    WriteInt(Sumar(4, 6), 3);   (* Imprime 10 *)
+    WriteLn;
+    
+    num := 5;
+    Incrementar(num, 10);
+    WriteInt(num, 5);           (* Imprime 15 *)
+    WriteLn;
+    
+    resultado := Factorial(5);
+    WriteInt(resultado, 5);     (* Imprime 120 *)
+    WriteLn;
+END ProcedimientosDemo.</code></pre>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="p-6 rounded-xl bg-gray-900 border border-gray-700">
+                        <h4 class="text-cyan-400 font-bold mb-2">Parámetros IN</h4>
+                        <p class="text-sm text-gray-400">Por valor (default). Se pasa una copia. Modificaciones no afectan al original.</p>
+                        <code class="text-xs text-cyan-300 block mt-2 font-mono">PROCEDURE P(x: INTEGER)</code>
+                    </div>
+                    <div class="p-6 rounded-xl bg-gray-900 border border-gray-700">
+                        <h4 class="text-fuchsia-400 font-bold mb-2">Parámetros VAR</h4>
+                        <p class="text-sm text-gray-400">Por referencia. Se pasa la dirección. Modificaciones afectan al original.</p>
+                        <code class="text-xs text-fuchsia-300 block mt-2 font-mono">PROCEDURE P(VAR x: INTEGER)</code>
+                    </div>
+                    <div class="p-6 rounded-xl bg-gray-900 border border-gray-700">
+                        <h4 class="text-yellow-400 font-bold mb-2">Arrays abiertos</h4>
+                        <p class="text-sm text-gray-400">Permiten pasar arrays de cualquier tamaño.</p>
+                        <code class="text-xs text-yellow-300 block mt-2 font-mono">PROCEDURE P(a: ARRAY OF CHAR)</code>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Punteros -->
+            <div class="mb-16">
+                <h3 class="font-cyber text-2xl md:text-3xl text-green-400 mb-6 flex items-center gap-3">
+                    <span class="w-8 h-8 rounded bg-green-500/20 flex items-center justify-center text-sm font-mono">04</span>
+                    Punteros y Gestión de Memoria
+                </h3>
+                
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span class="text-sm text-gray-400 font-mono">punteros.mod</span>
+                        </div>
+                        <pre><code class="language-delphi">MODULE PunterosDemo;
+FROM Storage IMPORT ALLOCATE, DEALLOCATE;
+FROM InOut IMPORT WriteInt, WriteLn;
+
+TYPE
+    NodoPtr = POINTER TO Nodo;
+    Nodo = RECORD
+        datos: INTEGER;
+        siguiente: NodoPtr;
+    END;
+
+VAR
+    cabeza, actual: NodoPtr;
+    i: INTEGER;
+
+BEGIN
+    (* Crear lista enlazada *)
+    NEW(cabeza);
+    cabeza^.datos := 1;
+    cabeza^.siguiente := NIL;
+    
+    actual := cabeza;
+    FOR i := 2 TO 5 DO
+        NEW(actual^.siguiente);
+        actual := actual^.siguiente;
+        actual^.datos := i * 10;
+        actual^.siguiente := NIL;
+    END;
+    
+    (* Recorrer e imprimir *)
+    actual := cabeza;
+    WHILE actual <> NIL DO
+        WriteInt(actual^.datos, 5);
+        actual := actual^.siguiente;
+    END;
+    WriteLn;
+    
+    (* Liberar memoria *)
+    WHILE cabeza <> NIL DO
+        actual := cabeza;
+        cabeza := cabeza^.siguiente;
+        DISPOSE(actual);
+    END;
+END PunterosDemo.</code></pre>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="p-6 rounded-xl bg-red-900/20 border border-red-500/30">
+                            <h4 class="text-red-400 font-bold mb-3 font-cyber">&#9888;&#65039; GESTIÓN MANUAL</h4>
+                            <p class="text-gray-300 text-sm mb-3">
+                                Modula-2 no tiene garbage collector. El programador debe liberar memoria explícitamente.
+                            </p>
+                            <div class="font-mono text-xs text-red-300 bg-black/30 p-3 rounded">
+                                NEW(ptr);      (* Asignar *)<br>
+                                DISPOSE(ptr);  (* Liberar *)
+                            </div>
+                        </div>
+                        
+                        <div class="p-6 rounded-xl bg-gray-900 border border-gray-700">
+                            <h4 class="text-cyan-400 font-bold mb-3">Operadores de Puntero</h4>
+                            <table class="w-full text-sm text-gray-400">
+                                <tr class="border-b border-gray-800">
+                                    <td class="py-2 font-mono text-cyan-300">^</td>
+                                    <td>Desreferenciación</td>
+                                    <td class="font-mono">ptr^.campo</td>
+                                </tr>
+                                <tr class="border-b border-gray-800">
+                                    <td class="py-2 font-mono text-cyan-300">=</td>
+                                    <td>Comparación</td>
+                                    <td class="font-mono">ptr1 = ptr2</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2 font-mono text-cyan-300">NIL</td>
+                                    <td>Puntero nulo</td>
+                                    <td class="font-mono">ptr := NIL</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- MODULES SECTION -->
+    <!-- ============================================================ -->
+    <section id="modulos" class="relative overflow-hidden fade-section">
+        <div class="absolute inset-0 bg-gradient-to-b from-cyan-900/10 to-fuchsia-900/10"></div>
+        <div class="max-w-7xl mx-auto relative z-10">
+            <h2 class="font-cyber text-4xl md:text-5xl font-bold mb-4 text-center">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-cyan-500">SISTEMA DE MÓDULOS</span>
+            </h2>
+            <p class="text-center text-gray-400 mb-12 text-lg max-w-3xl mx-auto">
+                La característica distintiva de Modula-2. Separación estricta entre interfaz pública 
+                (DEFINITION) e implementación privada (IMPLEMENTATION).
+            </p>
+            
+            <div class="grid lg:grid-cols-2 gap-8 mb-12">
+                <!-- Definition Module -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-3 h-3 rounded-full bg-cyan-400 animate-pulse"></div>
+                        <h3 class="font-cyber text-2xl text-cyan-400">DEFINITION MODULE</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Define la interfaz pública. Solo contiene declaraciones, no implementación.</p>
+                    
+                    <div class="code-block" style="border-color: rgba(0,243,255,0.3)">
+                        <div class="code-header" style="background: rgba(0,100,120,0.2)">
+                            <span class="text-sm text-cyan-400 font-mono">Stack.def</span>
+                        </div>
+                        <pre><code class="language-delphi">DEFINITION MODULE Stack;
+
+(* Interfaz pública del módulo Pila *)
+
+CONST
+    MaxStack = 100;
+
+TYPE
+    StackError = (NoError, Overflow, Underflow);
+
+VAR
+    error: StackError;
+
+PROCEDURE Init;
+PROCEDURE Push(c: CHAR);
+PROCEDURE Pop(): CHAR;
+PROCEDURE Full(): BOOLEAN;
+PROCEDURE Empty(): BOOLEAN;
+
+END Stack.</code></pre>
+                    </div>
+                </div>
+
+                <!-- Implementation Module -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-3 h-3 rounded-full bg-fuchsia-400 animate-pulse"></div>
+                        <h3 class="font-cyber text-2xl text-fuchsia-400">IMPLEMENTATION MODULE</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Contiene la implementación privada. Los detalles están ocultos al usuario.</p>
+                    
+                    <div class="code-block" style="border-color: rgba(255,0,255,0.3)">
+                        <div class="code-header" style="background: rgba(120,0,120,0.15)">
+                            <span class="text-sm text-fuchsia-400 font-mono">Stack.mod</span>
+                        </div>
+                        <pre><code class="language-delphi">IMPLEMENTATION MODULE Stack;
+
+VAR
+    data: ARRAY [1..MaxStack] OF CHAR;
+    tope: CARDINAL;
+
+PROCEDURE Init;
+BEGIN
+    tope := 0;
+    error := NoError;
+END Init;
+
+PROCEDURE Push(c: CHAR);
+BEGIN
+    IF tope < MaxStack THEN
+        INC(tope);
+        data[tope] := c;
+        error := NoError;
+    ELSE
+        error := Overflow;
+    END;
+END Push;
+
+PROCEDURE Pop(): CHAR;
+BEGIN
+    IF tope > 0 THEN
+        error := NoError;
+        DEC(tope);
+        RETURN data[tope + 1];
+    ELSE
+        error := Underflow;
+        RETURN CHR(0);
+    END;
+END Pop;
+
+PROCEDURE Full(): BOOLEAN;
+BEGIN
+    RETURN tope = MaxStack;
+END Full;
+
+PROCEDURE Empty(): BOOLEAN;
+BEGIN
+    RETURN tope = 0;
+END Empty;
+
+END Stack.</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Program Module -->
+            <div class="max-w-3xl mx-auto mb-12">
+                <h3 class="font-cyber text-2xl text-yellow-400 mb-4 text-center">PROGRAM MODULE (Cliente)</h3>
+                <div class="code-block" style="border-color: rgba(250,204,21,0.3)">
+                    <div class="code-header" style="background: rgba(120,100,0,0.15)">
+                        <span class="text-sm text-yellow-400 font-mono">TestStack.mod</span>
+                    </div>
+                    <pre><code class="language-delphi">MODULE TestStack;
+
+FROM InOut IMPORT WriteString, WriteLn;
+FROM Stack IMPORT Init, Push, Pop, Empty, error;
+
+VAR
+    c: CHAR;
+
+BEGIN
+    Init;
+    
+    WriteString("Apilando: A, B, C");
+    WriteLn;
+    
+    Push('A');
+    Push('B');
+    Push('C');
+    
+    WriteString("Desapilando: ");
+    WHILE NOT Empty() DO
+        c := Pop();
+        WriteString(" ");
+        (* WriteChar(c); *)
+    END;
+    WriteLn;
+    (* Resultado: C B A (LIFO) *)
+END TestStack.</code></pre>
+                </div>
+            </div>
+
+            <!-- Visual Diagram -->
+            <div class="grid md:grid-cols-5 gap-4 items-center">
+                <div class="module-box p-6 rounded-xl text-center md:col-span-1">
+                    <div class="text-cyan-400 font-cyber text-sm mb-2">DEFINITION</div>
+                    <div class="text-gray-500 text-xs">Interfaz Pública</div>
+                    <div class="mt-3 text-xs text-gray-600 font-mono">PROCEDURE headers<br>TYPE decl<br>CONST</div>
+                </div>
+                <div class="flex items-center justify-center text-cyan-600 text-2xl">&#8594;</div>
+                <div class="module-box p-6 rounded-xl text-center md:col-span-1" style="border-color: var(--neon-pink)">
+                    <div class="text-fuchsia-400 font-cyber text-sm mb-2">IMPLEMENTATION</div>
+                    <div class="text-gray-500 text-xs">Código Privado</div>
+                    <div class="mt-3 text-xs text-gray-600 font-mono">PROCEDURE bodies<br>VAR privadas<br>Lógica interna</div>
+                </div>
+                <div class="flex items-center justify-center text-cyan-600 text-2xl">&#8594;</div>
+                <div class="module-box p-6 rounded-xl text-center md:col-span-1" style="border-color: #facc15">
+                    <div class="text-yellow-400 font-cyber text-sm mb-2">PROGRAM</div>
+                    <div class="text-gray-500 text-xs">Cliente</div>
+                    <div class="mt-3 text-xs text-gray-600 font-mono">FROM X IMPORT Y<br>Uso de API<br>Main logic</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- COMPILER SECTION (NEW) -->
+    <!-- ============================================================ -->
+    <section id="compilador" class="bg-black/40 fade-section">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="font-cyber text-4xl md:text-5xl font-bold mb-4 text-center">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-500">EL COMPILADOR</span>
+            </h2>
+            <p class="text-center text-gray-400 mb-16 text-lg max-w-3xl mx-auto">
+                GNU Modula-2 (GM2): El compilador moderno, libre y multiplataforma integrado en GCC.
+            </p>
+
+            <!-- Compiler Overview -->
+            <div class="grid lg:grid-cols-2 gap-8 mb-16">
+                <div>
+                    <h3 class="font-cyber text-2xl text-green-400 mb-6">GNU Modula-2 (GM2)</h3>
+                    <p class="text-gray-300 leading-relaxed mb-4">
+                        GM2 es un front-end de <strong class="text-white">GCC (GNU Compiler Collection)</strong> que permite 
+                        compilar Modula-2 utilizando la misma infraestructura que compila C, C++, Fortran y otros lenguajes.
+                    </p>
+                    <p class="text-gray-300 leading-relaxed mb-6">
+                        Desarrollado por <strong class="text-green-300">Gaius Mulley</strong> durante más de 25 años, GM2 se integró 
+                        oficialmente en GCC a partir de la versión 13, convirtiéndolo en un compilador de primera clase con 
+                        soporte completo para optimizaciones avanzadas de GCC.
+                    </p>
+
+                    <div class="space-y-3">
+                        <div class="p-4 rounded-lg bg-green-900/20 border border-green-500/30 flex items-center gap-4">
+                            <div class="text-green-400 text-2xl">&#9889;</div>
+                            <div>
+                                <div class="text-white font-bold text-sm">Compilador Nativo</div>
+                                <div class="text-gray-400 text-xs">Genera código máquina optimizado directamente</div>
+                            </div>
+                        </div>
+                        <div class="p-4 rounded-lg bg-green-900/20 border border-green-500/30 flex items-center gap-4">
+                            <div class="text-green-400 text-2xl">&#128230;</div>
+                            <div>
+                                <div class="text-white font-bold text-sm">Multi-dialecto</div>
+                                <div class="text-gray-400 text-xs">Soporta PIM2, PIM3, PIM4 e ISO Modula-2</div>
+                            </div>
+                        </div>
+                        <div class="p-4 rounded-lg bg-green-900/20 border border-green-500/30 flex items-center gap-4">
+                            <div class="text-green-400 text-2xl">&#127760;</div>
+                            <div>
+                                <div class="text-white font-bold text-sm">Multiplataforma</div>
+                                <div class="text-gray-400 text-xs">Linux, macOS, Windows (MinGW), ARM, RISC-V</div>
+                            </div>
+                        </div>
+                        <div class="p-4 rounded-lg bg-green-900/20 border border-green-500/30 flex items-center gap-4">
+                            <div class="text-green-400 text-2xl">&#128279;</div>
+                            <div>
+                                <div class="text-white font-bold text-sm">Interoperabilidad con C</div>
+                                <div class="text-gray-400 text-xs">Puede llamar funciones C y enlazar con bibliotecas C</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Compilation Pipeline -->
+                <div>
+                    <h3 class="font-cyber text-2xl text-cyan-400 mb-6">Pipeline de Compilación</h3>
+                    <div class="space-y-4">
+                        <div class="compiler-step p-4 rounded-xl bg-gray-900/50 border border-gray-800">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center font-cyber text-cyan-400 text-sm">01</div>
+                                <div>
+                                    <div class="text-white font-bold">Análisis Léxico</div>
+                                    <div class="text-gray-400 text-xs mt-1">Tokeniza el código fuente (.mod / .def) en tokens: palabras reservadas, identificadores, literales, operadores</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-center text-cyan-600">&#9660;</div>
+                        <div class="compiler-step p-4 rounded-xl bg-gray-900/50 border border-gray-800">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-lg bg-fuchsia-500/20 flex items-center justify-center font-cyber text-fuchsia-400 text-sm">02</div>
+                                <div>
+                                    <div class="text-white font-bold">Análisis Sintáctico</div>
+                                    <div class="text-gray-400 text-xs mt-1">Construye el AST (Árbol de Sintaxis Abstracta) verificando la gramática LL(1) del lenguaje</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-center text-cyan-600">&#9660;</div>
+                        <div class="compiler-step p-4 rounded-xl bg-gray-900/50 border border-gray-800">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center font-cyber text-yellow-400 text-sm">03</div>
+                                <div>
+                                    <div class="text-white font-bold">Análisis Semántico</div>
+                                    <div class="text-gray-400 text-xs mt-1">Verificación de tipos, resolución de módulos importados, comprobación de visibilidad (EXPORT/IMPORT)</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-center text-cyan-600">&#9660;</div>
+                        <div class="compiler-step p-4 rounded-xl bg-gray-900/50 border border-gray-800">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center font-cyber text-green-400 text-sm">04</div>
+                                <div>
+                                    <div class="text-white font-bold">Generación de GIMPLE/RTL</div>
+                                    <div class="text-gray-400 text-xs mt-1">GM2 traduce el AST a la representación intermedia de GCC (GIMPLE), que luego se optimiza</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-center text-cyan-600">&#9660;</div>
+                        <div class="compiler-step p-4 rounded-xl bg-gray-900/50 border border-gray-800">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center font-cyber text-red-400 text-sm">05</div>
+                                <div>
+                                    <div class="text-white font-bold">Código Máquina</div>
+                                    <div class="text-gray-400 text-xs mt-1">GCC genera el ejecutable nativo para la arquitectura destino (x86_64, ARM, etc.)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Installation & Usage -->
+            <div class="mb-16">
+                <h3 class="font-cyber text-2xl text-yellow-400 mb-6 flex items-center gap-3">
+                    <span class="w-10 h-10 rounded bg-yellow-500/20 flex items-center justify-center text-lg">&#128187;</span>
+                    Instalación y Uso de GM2
+                </h3>
+                
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <!-- Install -->
+                    <div class="terminal-window">
+                        <div class="terminal-header">
+                            <div class="code-dot dot-red"></div>
+                            <div class="code-dot dot-yellow"></div>
+                            <div class="code-dot dot-green"></div>
+                            <span class="ml-3 text-gray-400 text-sm font-mono">Instalación en Linux (Ubuntu/Debian)</span>
+                        </div>
+                        <div class="terminal-body text-sm">
+                            <div class="comment"># Actualizar repositorios</div>
+                            <div><span class="prompt">$ </span><span class="command">sudo apt update</span></div>
+                            <br>
+                            <div class="comment"># Instalar GCC con soporte Modula-2</div>
+                            <div><span class="prompt">$ </span><span class="command">sudo apt install gm2</span></div>
+                            <br>
+                            <div class="comment"># Verificar la instalación</div>
+                            <div><span class="prompt">$ </span><span class="command">gm2 --version</span></div>
+                            <div class="output">gm2 (Ubuntu 14.2.0-4ubuntu2) 14.2.0</div>
+                            <div class="output">Copyright (C) 2024 Free Software Foundation</div>
+                            <br>
+                            <div class="comment"># Alternativa: instalar GCC 14+ completo</div>
+                            <div><span class="prompt">$ </span><span class="command">sudo apt install gcc-14-gm2</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Compile & Run -->
+                    <div class="terminal-window">
+                        <div class="terminal-header">
+                            <div class="code-dot dot-red"></div>
+                            <div class="code-dot dot-yellow"></div>
+                            <div class="code-dot dot-green"></div>
+                            <span class="ml-3 text-gray-400 text-sm font-mono">Compilar y Ejecutar</span>
+                        </div>
+                        <div class="terminal-body text-sm">
+                            <div class="comment"># Compilar un programa</div>
+                            <div><span class="prompt">$ </span><span class="command">gm2 -o programa HolaMundo.mod</span></div>
+                            <br>
+                            <div class="comment"># Ejecutar</div>
+                            <div><span class="prompt">$ </span><span class="command">./programa</span></div>
+                            <div class="output">Hola Mundo desde Modula-2!</div>
+                            <br>
+                            <div class="comment"># Compilar con dialecto específico</div>
+                            <div><span class="prompt">$ </span><span class="command">gm2 -fiso -o prog programa.mod</span></div>
+                            <br>
+                            <div class="comment"># Flags comunes:</div>
+                            <div class="comment">#   -fpim2  -fpim3  -fpim4  (PIM dialects)</div>
+                            <div class="comment">#   -fiso                   (ISO standard)</div>
+                            <div class="comment">#   -g                      (debug info)</div>
+                            <div class="comment">#   -O2                     (optimización)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Other compilers -->
+            <div>
+                <h3 class="font-cyber text-2xl text-gray-400 mb-6">Otros Compiladores Históricos</h3>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="p-4 rounded-xl bg-gray-900/50 border border-gray-800">
+                        <div class="text-white font-bold text-sm mb-1">TopSpeed M2</div>
+                        <div class="text-xs text-gray-500">DOS/Windows. Muy popular en los 90s. IDE integrado.</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-gray-900/50 border border-gray-800">
+                        <div class="text-white font-bold text-sm mb-1">StonyBrook M2</div>
+                        <div class="text-xs text-gray-500">Windows. Compilador optimizador de alto rendimiento.</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-gray-900/50 border border-gray-800">
+                        <div class="text-white font-bold text-sm mb-1">XDS Modula-2</div>
+                        <div class="text-xs text-gray-500">Windows/Linux. Soporte ISO y PIM. Aún disponible.</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-gray-900/50 border border-gray-800">
+                        <div class="text-white font-bold text-sm mb-1">p1 Modula-2</div>
+                        <div class="text-xs text-gray-500">macOS. Compilador nativo para Apple Silicon.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- COMPLETE EXAMPLE SECTION (NEW) -->
+    <!-- ============================================================ -->
+    <section id="ejemplo" class="fade-section">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="font-cyber text-4xl md:text-5xl font-bold mb-4 text-center">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-green-500">EJEMPLO COMPLETO</span>
+            </h2>
+            <p class="text-center text-gray-400 mb-16 text-lg max-w-3xl mx-auto">
+                Programa completo compilado y ejecutado con GNU Modula-2: una calculadora interactiva 
+                que demuestra módulos, procedimientos, ciclos, condicionales y E/S.
+            </p>
+
+            <!-- The Complete Program -->
+            <div class="grid lg:grid-cols-3 gap-8 mb-12">
+                <!-- Definition Module -->
+                <div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-3 h-3 rounded-full bg-cyan-400"></div>
+                        <span class="font-cyber text-cyan-400 text-sm">PASO 1: Definición</span>
+                    </div>
+                    <div class="code-block" style="border-color: rgba(0,243,255,0.3)">
+                        <div class="code-header" style="background: rgba(0,100,120,0.15)">
+                            <span class="text-xs text-cyan-400 font-mono">Calculadora.def</span>
+                        </div>
+                        <pre><code class="language-delphi">DEFINITION MODULE Calculadora;
+
+(* Interfaz pública de 
+   operaciones aritméticas *)
+
+PROCEDURE Sumar(a, b: INTEGER)
+    : INTEGER;
+
+PROCEDURE Restar(a, b: INTEGER)
+    : INTEGER;
+
+PROCEDURE Multiplicar(a, b: INTEGER)
+    : INTEGER;
+
+PROCEDURE Dividir(a, b: INTEGER;
+    VAR exito: BOOLEAN) : INTEGER;
+
+END Calculadora.</code></pre>
+                    </div>
+                </div>
+
+                <!-- Implementation Module -->
+                <div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-3 h-3 rounded-full bg-fuchsia-400"></div>
+                        <span class="font-cyber text-fuchsia-400 text-sm">PASO 2: Implementación</span>
+                    </div>
+                    <div class="code-block" style="border-color: rgba(255,0,255,0.3)">
+                        <div class="code-header" style="background: rgba(120,0,120,0.1)">
+                            <span class="text-xs text-fuchsia-400 font-mono">Calculadora.mod</span>
+                        </div>
+                        <pre><code class="language-delphi">IMPLEMENTATION MODULE Calculadora;
+
+PROCEDURE Sumar(a, b: INTEGER)
+    : INTEGER;
+BEGIN
+    RETURN a + b;
+END Sumar;
+
+PROCEDURE Restar(a, b: INTEGER)
+    : INTEGER;
+BEGIN
+    RETURN a - b;
+END Restar;
+
+PROCEDURE Multiplicar(a, b: INTEGER)
+    : INTEGER;
+BEGIN
+    RETURN a * b;
+END Multiplicar;
+
+PROCEDURE Dividir(a, b: INTEGER;
+    VAR exito: BOOLEAN) : INTEGER;
+BEGIN
+    IF b = 0 THEN
+        exito := FALSE;
+        RETURN 0;
+    ELSE
+        exito := TRUE;
+        RETURN a DIV b;
+    END;
+END Dividir;
+
+END Calculadora.</code></pre>
+                    </div>
+                </div>
+
+                <!-- Main Program -->
+                <div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                        <span class="font-cyber text-yellow-400 text-sm">PASO 3: Programa Principal</span>
+                    </div>
+                    <div class="code-block" style="border-color: rgba(250,204,21,0.3)">
+                        <div class="code-header" style="background: rgba(120,100,0,0.1)">
+                            <span class="text-xs text-yellow-400 font-mono">TestCalc.mod</span>
+                        </div>
+                        <pre><code class="language-delphi">MODULE TestCalc;
+
+FROM InOut IMPORT
+    WriteString, WriteInt,
+    WriteLn, ReadInt;
+FROM Calculadora IMPORT
+    Sumar, Restar,
+    Multiplicar, Dividir;
+
+VAR
+    a, b, resultado : INTEGER;
+    exito : BOOLEAN;
+
+BEGIN
+    WriteString("=== Calculadora ===");
+    WriteLn;
+    
+    WriteString("Ingrese A: ");
+    ReadInt(a);
+    WriteString("Ingrese B: ");
+    ReadInt(b);
+    
+    WriteString("Suma: ");
+    WriteInt(Sumar(a, b), 5);
+    WriteLn;
+    
+    WriteString("Resta: ");
+    WriteInt(Restar(a, b), 5);
+    WriteLn;
+    
+    WriteString("Multiplicacion: ");
+    WriteInt(Multiplicar(a, b), 5);
+    WriteLn;
+    
+    resultado := Dividir(a, b, exito);
+    IF exito THEN
+        WriteString("Division: ");
+        WriteInt(resultado, 5);
+    ELSE
+        WriteString("Error: division/0");
+    END;
+    WriteLn;
+    
+    WriteString("=== Fin ===");
+    WriteLn;
+END TestCalc.</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compilation Steps -->
+            <div class="max-w-4xl mx-auto mb-12">
+                <h3 class="font-cyber text-2xl text-green-400 mb-6 text-center">Compilación y Ejecución</h3>
+                
+                <div class="terminal-window">
+                    <div class="terminal-header">
+                        <div class="code-dot dot-red"></div>
+                        <div class="code-dot dot-yellow"></div>
+                        <div class="code-dot dot-green"></div>
+                        <span class="ml-3 text-gray-400 text-sm font-mono">Terminal — Compilar y Ejecutar con GM2</span>
+                    </div>
+                    <div class="terminal-body text-sm">
+                        <div class="comment"># Paso 1: Compilar la implementación del módulo</div>
+                        <div><span class="prompt">$ </span><span class="command">gm2 -c Calculadora.mod</span></div>
+                        <br>
+                        <div class="comment"># Paso 2: Compilar el programa principal y enlazar</div>
+                        <div><span class="prompt">$ </span><span class="command">gm2 -o calculadora TestCalc.mod Calculadora.o</span></div>
+                        <br>
+                        <div class="comment"># Paso 3: Ejecutar</div>
+                        <div><span class="prompt">$ </span><span class="command">./calculadora</span></div>
+                        <div class="output">=== Calculadora ===</div>
+                        <div class="output">Ingrese A: <span class="command">15</span></div>
+                        <div class="output">Ingrese B: <span class="command">4</span></div>
+                        <div class="output">Suma:    19</div>
+                        <div class="output">Resta:    11</div>
+                        <div class="output">Multiplicacion:    60</div>
+                        <div class="output">Division:     3</div>
+                        <div class="output">=== Fin ===</div>
+                        <br>
+                        <div class="comment"># Probar con división por cero</div>
+                        <div><span class="prompt">$ </span><span class="command">./calculadora</span></div>
+                        <div class="output">=== Calculadora ===</div>
+                        <div class="output">Ingrese A: <span class="command">10</span></div>
+                        <div class="output">Ingrese B: <span class="command">0</span></div>
+                        <div class="output">Suma:    10</div>
+                        <div class="output">Resta:    10</div>
+                        <div class="output">Multiplicacion:     0</div>
+                        <div class="error">Error: division/0</div>
+                        <div class="output">=== Fin ===</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- What this demonstrates -->
+            <div class="max-w-4xl mx-auto">
+                <h3 class="font-cyber text-xl text-gray-400 mb-4 text-center">¿Qué demuestra este ejemplo?</h3>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="p-4 rounded-xl bg-cyan-900/15 border border-cyan-500/20 text-center">
+                        <div class="text-cyan-400 font-bold text-sm mb-2">Modularidad</div>
+                        <div class="text-xs text-gray-400">Separación clara entre .def (interfaz) y .mod (implementación)</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-fuchsia-900/15 border border-fuchsia-500/20 text-center">
+                        <div class="text-fuchsia-400 font-bold text-sm mb-2">Encapsulación</div>
+                        <div class="text-xs text-gray-400">El programa cliente solo ve la interfaz, no los detalles internos</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-yellow-900/15 border border-yellow-500/20 text-center">
+                        <div class="text-yellow-400 font-bold text-sm mb-2">Compilación Separada</div>
+                        <div class="text-xs text-gray-400">Cada módulo se compila independientemente y se enlaza al final</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-green-900/15 border border-green-500/20 text-center">
+                        <div class="text-green-400 font-bold text-sm mb-2">Tipado Fuerte</div>
+                        <div class="text-xs text-gray-400">Parámetros con tipos explícitos, verificados en compilación</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-purple-900/15 border border-purple-500/20 text-center">
+                        <div class="text-purple-400 font-bold text-sm mb-2">Funciones y VAR</div>
+                        <div class="text-xs text-gray-400">Retorno de valores y parámetros por referencia (Dividir)</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-red-900/15 border border-red-500/20 text-center">
+                        <div class="text-red-400 font-bold text-sm mb-2">Manejo de Errores</div>
+                        <div class="text-xs text-gray-400">Control de división por cero con flag BOOLEAN</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- LEGACY & INFLUENCE SECTION (NEW) -->
+    <!-- ============================================================ -->
+    <section id="legado" class="bg-black/40 fade-section">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="font-cyber text-4xl md:text-5xl font-bold mb-4 text-center">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-yellow-500">LEGADO E INFLUENCIA</span>
+            </h2>
+            <p class="text-center text-gray-400 mb-16 text-lg max-w-3xl mx-auto">
+                Modula-2 transformó la forma en que pensamos sobre la organización del software. 
+                Su influencia se extiende hasta los lenguajes modernos.
+            </p>
+
+            <!-- Influence tree -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+                <div class="p-6 rounded-xl bg-gray-900 border border-gray-800 hover:border-cyan-500/50 transition-all hover:transform hover:-translate-y-2">
+                    <div class="text-cyan-400 font-cyber text-lg mb-2">Ada</div>
+                    <p class="text-sm text-gray-400">El diseño de Ada-83 tomó prestado el sistema de módulos de Modula-2 (packages).</p>
+                    <div class="mt-3 text-xs text-cyan-600 font-mono">1983</div>
+                </div>
+                <div class="p-6 rounded-xl bg-gray-900 border border-gray-800 hover:border-fuchsia-500/50 transition-all hover:transform hover:-translate-y-2">
+                    <div class="text-fuchsia-400 font-cyber text-lg mb-2">Modula-3</div>
+                    <p class="text-sm text-gray-400">Extensión con orientación a objetos, excepciones y garbage collection (DEC/Oracle).</p>
+                    <div class="mt-3 text-xs text-fuchsia-600 font-mono">1989</div>
+                </div>
+                <div class="p-6 rounded-xl bg-gray-900 border border-gray-800 hover:border-yellow-500/50 transition-all hover:transform hover:-translate-y-2">
+                    <div class="text-yellow-400 font-cyber text-lg mb-2">Oberon</div>
+                    <p class="text-sm text-gray-400">Sucesor directo de Wirth: simplificación extrema con módulos y tipos extensibles.</p>
+                    <div class="mt-3 text-xs text-yellow-600 font-mono">1986</div>
+                </div>
+                <div class="p-6 rounded-xl bg-gray-900 border border-gray-800 hover:border-green-500/50 transition-all hover:transform hover:-translate-y-2">
+                    <div class="text-green-400 font-cyber text-lg mb-2">Java / C#</div>
+                    <p class="text-sm text-gray-400">El concepto de interfaces y paquetes proviene indirectamente de Modula-2.</p>
+                    <div class="mt-3 text-xs text-green-600 font-mono">1995 / 2000</div>
+                </div>
+            </div>
+
+            <!-- Wirth's Design Philosophy -->
+            <div class="max-w-4xl mx-auto mb-16">
+                <h3 class="font-cyber text-2xl text-cyan-400 mb-6 text-center">Filosofía de Diseño de Wirth</h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="p-6 rounded-xl bg-gradient-to-br from-cyan-900/20 to-transparent border border-cyan-500/20">
+                        <div class="text-3xl mb-3">&#127919;</div>
+                        <h4 class="text-white font-bold mb-2">Simplicidad</h4>
+                        <p class="text-sm text-gray-400">"Un lenguaje de programación debe ser simple. Si tiene demasiadas características, confunde al programador."</p>
+                    </div>
+                    <div class="p-6 rounded-xl bg-gradient-to-br from-fuchsia-900/20 to-transparent border border-fuchsia-500/20">
+                        <div class="text-3xl mb-3">&#128737;&#65039;</div>
+                        <h4 class="text-white font-bold mb-2">Seguridad</h4>
+                        <p class="text-sm text-gray-400">Tipado fuerte y verificación estática eliminan clases enteras de errores antes de ejecutar.</p>
+                    </div>
+                    <div class="p-6 rounded-xl bg-gradient-to-br from-yellow-900/20 to-transparent border border-yellow-500/20">
+                        <div class="text-3xl mb-3">&#128230;</div>
+                        <h4 class="text-white font-bold mb-2">Modularidad</h4>
+                        <p class="text-sm text-gray-400">Dividir para conquistar: cada módulo es una unidad independiente que puede desarrollarse y probarse por separado.</p>
+                    </div>
+                    <div class="p-6 rounded-xl bg-gradient-to-br from-green-900/20 to-transparent border border-green-500/20">
+                        <div class="text-3xl mb-3">&#128736;&#65039;</div>
+                        <h4 class="text-white font-bold mb-2">Principio Abierto-Cerrado</h4>
+                        <p class="text-sm text-gray-400">Los módulos están abiertos a extensión pero cerrados a modificación interna. Pionero del OCP de SOLID.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Final Quote -->
+            <div class="max-w-3xl mx-auto text-center p-8 rounded-2xl bg-gradient-to-r from-cyan-900/20 to-fuchsia-900/20 border border-cyan-500/30">
+                <svg class="w-12 h-12 text-cyan-400 mx-auto mb-4 opacity-50" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
+                </svg>
+                <p class="text-xl text-gray-300 italic mb-4">
+                    "El software se está haciendo cada vez más lento a un ritmo mucho mayor 
+                    de lo que el hardware se está haciendo más rápido."
+                </p>
+                <div class="text-cyan-400 font-cyber mb-2">— Ley de Wirth</div>
+                <div class="text-gray-500 text-sm">Niklaus Wirth (1934–2024), Premio Turing 1984</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- FOOTER -->
+    <!-- ============================================================ -->
+    <footer class="py-12 px-4 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="font-cyber text-2xl text-cyan-400 mb-4">MODULA-2</div>
+            <p class="text-gray-500 text-sm mb-4">
+                Exposición &mdash; Lenguajes de Programación &bull; I Ciclo 2026
+            </p>
+            <p class="text-gray-600 text-sm mb-6">
+                Josh &bull; Adrián &bull; Jose &mdash; Grupo 4
+            </p>
+            <div class="flex justify-center gap-6 text-xs font-mono text-gray-600">
+                <span>ETH Zürich, 1978</span>
+                <span>&bull;</span>
+                <span>Niklaus Wirth</span>
+                <span>&bull;</span>
+                <span>ISO/IEC 10514-1</span>
+                <span>&bull;</span>
+                <span>GNU Modula-2 / GCC</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ============================================================ -->
+    <!-- SCRIPTS -->
+    <!-- ============================================================ -->
+    <script>
+        // Highlight.js init
+        hljs.highlightAll();
+
+        // Scroll progress bar
+        window.addEventListener('scroll', () => {
+            const scrollTop = document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const progress = (scrollTop / scrollHeight) * 100;
+            document.getElementById('scrollProgress').style.width = progress + '%';
+            
+            // Back to top button
+            const btn = document.getElementById('backToTop');
+            if (scrollTop > 500) {
+                btn.classList.add('visible');
+            } else {
+                btn.classList.remove('visible');
+            }
+        });
+
+        // Intersection Observer for fade-in sections
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.fade-section').forEach(el => observer.observe(el));
+
+        // GSAP Animations for timeline items
+        gsap.registerPlugin(ScrollTrigger);
+
+        gsap.utils.toArray('.timeline-item').forEach((item, i) => {
+            gsap.fromTo(item, 
+                { opacity: 0, x: -50 },
+                {
+                    opacity: 1,
+                    x: 0,
+                    duration: 0.8,
+                    ease: "power2.out",
+                    scrollTrigger: {
+                        trigger: item,
+                        start: "top 85%",
+                        toggleActions: "play none none none"
+                    }
+                }
+            );
+        });
+
+        // Smooth scroll for nav links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    // Close mobile menu
+                    document.getElementById('mobileMenu').classList.add('hidden');
+                }
+            });
+        });
+
+        // Active nav highlighting
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('nav a[href^="#"]');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (scrollY >= sectionTop) {
+                    current = section.getAttribute('id');
+                }
+            });
+            navLinks.forEach(link => {
+                link.classList.remove('text-cyan-400');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('text-cyan-400');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
